@@ -267,15 +267,15 @@ multilogit_prob = function(param,data) {
 probij_matrix <- multilogit_prob(par_n, my_sample)
 mb <- c(0, par_n[39:76])
 
-multilogit_margeff <- matrix(0, nrow = 300, ncol = 39)
+multilogit <- matrix(0, nrow = 300, ncol = 39)
 for (i in 1:300) {
   beta_bar <- sum(probij_matrix[i, ] * mb)
-  multilogit_margeff[i, ] <- probij_matrix[i, ] * (mb - beta_bar)
+  multilogit[i, ] <- probij_matrix[i, ] * (mb - beta_bar)
 }
 
-multilogit_margeff <- apply(multilogit_margeff, 2, mean)
-multilogit_margeff <- as.data.frame(multilogit_margeff)
-colnames(multilogit_margeff) <- 'Marginal Effect'
+multilogit <- apply(multilogit, 2, mean)
+multilogit <- as.data.frame(multilogit)
+colnames(multilogit) <- 'Marginal Effect'
 
 
 #Exercise 6 Second Model
@@ -294,7 +294,7 @@ condlogit_like_fun = function(param, data) {
   for (j in 1:nj) {
     out[, j] <- pn1[j] + param[nj] * unique_choice_quality[j] 
   }
-  prob_sum <- exp(out)
+  prob <- exp(out)
   prob <- sweep(prob, MARGIN = 1, FUN = "/", STATS = rowSums(prob))
   prob_c <- NULL
   for (i in 1:ni) {
@@ -329,25 +329,25 @@ condlogit_prob_matrix = function(param, data) {
   for (j in 1:nj) {
     out[, j] <- pn1[j] + param[nj] * unique_choice_quality[j]
   }
-  prob_sums <- apply(exp(out), 1, sum)      
-  prob <- exp(out)/prob_sums
+  prob_sum <- apply(exp(out), 1, sum)      
+  prob <- exp(out)/prob_sum
   return(prob)
 }
 
 condprobij_matrix <- condlogit_prob_matrix(result2$par, my_sample)
 mb2 <- c(0, par_n2[39:76])
 
-condlogit_margeff <- matrix(0, nrow = 500, ncol = 39)
-for (i in 1:500) {
-  for (j in 1:500) {
+condlogit <- matrix(0, nrow = 300, ncol = 39)
+for (i in 1:300) {
+  for (j in 1:300) {
     for (k in 1:39) {
-      condlogit_margeff[i, j, k] = condprobij_matrix[i, j] * (1 - condprobij_matrix[i, k] * par_n2[n])
+      condlogit[i, j, k] = condprobij_matrix[i, j] * (1 - condprobij_matrix[i, k] * par_n2[39])
     }
   }
 }
-condlogit_margeff <- apply(condlogit_margeff, 2:3, mean)
-condlogit_margeff <- as.data.frame(condlogit_margeff)
-colnames(condlogit_margeff) <- 'Marginal Effect'
+condlogit <- apply(condlogit, 2:3, mean)
+condlogit <- as.data.frame(condlogit)
+
 #Exercise 7
 #(a)
 # I would say the conditional logit model is better than the first one. 
@@ -356,11 +356,12 @@ colnames(condlogit_margeff) <- 'Marginal Effect'
 
 #(b)
 
-condlogit_like_fun(par_n2, my_sample)
-condlogit_prob_matrix(par_n2, my_sample)
-
 #(c)
 
-
+excluding <- my_sample %>% filter(program_first != "Others")
+result3 <- optim(runif(39), fn = condlogit_like_fun, method = "BFGS", control = list(trace = 6, REPORT = 1, maxit = 10000), data = my_sample, hessian = TRUE)
+par_n3 <- result3$par
+condlogit_like_fun(par_m3, our_sample)
+condlogit_prob_matrix(par_m3, our_sample)
 
 
