@@ -279,7 +279,7 @@ colnames(multilogit) <- 'Marginal Effect'
 
 
 #Exercise 6 Second Model
-condlogit_like_fun = function(param, data) {
+clogit_like_fun = function(param, data) {
   quality <- data$quality_rev
   choice <- data$choice_rev
   ni <- nrow(data)
@@ -305,6 +305,8 @@ condlogit_like_fun = function(param, data) {
   like <- sum(log(prob_c))
   return(-like)
 }
+
+
 
 set.seed(123)
 start_2 <- runif(76, -0.02, 0.02)
@@ -359,9 +361,12 @@ condlogit <- as.data.frame(condlogit)
 #(c)
 
 excluding <- my_sample %>% filter(program_first != "Others")
-result3 <- optim(runif(39), fn = condlogit_like_fun, method = "BFGS", control = list(trace = 6, REPORT = 1, maxit = 10000), data = my_sample, hessian = TRUE)
+result3 <- optim(runif(39), fn = clogit_like_fun, method = "BFGS", control = list(trace = 6, REPORT = 1, maxit = 10000), data = my_sample, hessian = TRUE)
+result3 <- optim(start_2,fn = clogit_like_fun, method = "BFGS",
+                 control = list(trace = 6, REPORT = 1, maxit = 10000), data = my_sample, hessian = TRUE)
+
 par_n3 <- result3$par
-condlogit_like_fun(par_m3, our_sample)
-condlogit_prob_matrix(par_m3, our_sample)
+condlogit_like_fun(par_m3, my_sample)
+condlogit_prob_matrix(par_m3, my_sample)
 
 
