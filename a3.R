@@ -355,12 +355,10 @@ condlogit <- as.data.frame(condlogit)
 #(c)
 
 excluding <- my_sample %>% filter(program_first != "Others")
-result3 <- optim(runif(39), fn = clogit_like_fun, method = "BFGS", control = list(trace = 6, REPORT = 1, maxit = 10000), data = my_sample, hessian = TRUE)
-result3 <- optim(start_2,fn = clogit_like_fun, method = "BFGS",
+result3 <- optim(start_2, fn = clogit_like_fun, method = "BFGS", 
                  control = list(trace = 6, REPORT = 1, maxit = 10000), data = my_sample, hessian = TRUE)
-
 par_n3 <- result3$par
-condlogit_like_fun(par_m3, my_sample)
-condlogit_prob_matrix(par_m3, my_sample)
+clogit_like_fun(par_m3, my_sample)
+clogit_prob_matrix(par_m3, my_sample)
 
 
